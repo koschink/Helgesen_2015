@@ -1,6 +1,8 @@
 # Helgesen_2015
 A script to measure distances of replication foci in E.coli using ImageJ and Python. 
-For a more complete description, see Helgesen et al, 2015 
+For a more complete description, see our publication:
+Dynamic Escherichia coli SeqA complexes organize the newly replicated DNA at a considerable distance from the replisome
+Helgesen et al, 2015 
 (https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4357733/)
 
 This script perfomes automatic measurements of the distance between neighboring spots that are registered in two different fluorescence channels. The script utilizes the “Find maxima” function to detect spots and then measures the distance to the nearest neighbouring spot. The resulting output can give distances
@@ -17,3 +19,4 @@ For further information or comments, please contact the author (kay.oliver.schin
 
 You are free to use this software in your research under the BSD3 license. If you find this software useful, please cite our publication
 
+[![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
