@@ -15,3 +15,5 @@ text, prefixed with hash tags (#)
 
 For further information or comments, please contact the author (kay.oliver.schink@rr-research.no)
 
+You are free to use this software in your research under the BSD3 license. If you find this software useful, please cite our publication
+
