@@ -1,9 +1,9 @@
 """
-A script to measure distances of replication foci in E.coli using ImageJ 
-and Python. For a more complete description, see our publication: Dynamic 
-Escherichia coli SeqA complexes organize the newly replicated DNA at a 
-considerable distance from the replisome Helgesen et al, 2015 (
-https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4357733/)
+A script to measure distances of replication foci in E.coli using ImageJ
+and Python. For a more complete description, see our publication: Dynamic
+Escherichia coli SeqA complexes organize the newly replicated DNA at a
+considerable distance from the replisome Helgesen et al, 2015
+(https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4357733/)
 """
 from ij import IJ
 from ij import *
@@ -22,10 +22,10 @@ from ij.process import ImageStatistics
 from ij.gui import Roi
 from ij.gui import PointRoi
 from ij.gui import OvalRoi
-import math 
-from java.awt import * 
+import math
+from java.awt import *
 from java.awt import Font
-import itertools 
+import itertools
 import os
 import glob
 
@@ -44,7 +44,7 @@ automatic_save_results = True
 
 savepath = "L:/KRK/KRF"   # storage of the data , use "/" instead of "\" as path separator
 
-### Do MaxEntropy thresholding prior to Maximum Detection? 
+### Do MaxEntropy thresholding prior to Maximum Detection?
 ### Im proves MaxEntropy detection
 ####Attention: Use not in combinaton with intensity measurements, since this will eliminate cellular structures below the threshold
 ### Use in conjuction with Pearson might generate artifacts or division by 0 errors (should be catched by the pearsons calculation, but use at your own risk!)
@@ -152,91 +152,91 @@ def ThresholdMaxEntropy(imp0):
 
 
 
-#dist_min = 1 
-#dist_max = 10 
- 
-def dist(p0, p1): 
+#dist_min = 1
+#dist_max = 10
+
+def dist(p0, p1):
     """ Calculates the  distance between two xy coordinates, each
     each coordinated supplied by a tupel"""
-    return math.sqrt((p0[0] - p1[0])**2 + (p0[1] - p1[1])**2) 
+    return math.sqrt((p0[0] - p1[0])**2 + (p0[1] - p1[1])**2)
 
-#x = [] 
-#y = [] 
- 
-# pearson code from from http://stackoverflow.com/questions/3949226/calculating-pearson-correlation-and-significance-in-python 
- 
-def average(x): 
+#x = []
+#y = []
+
+# pearson code from from http://stackoverflow.com/questions/3949226/calculating-pearson-correlation-and-significance-in-python
+
+def average(x):
     """calculates the averade of a list x"""
-    assert len(x) > 0 
-    return float(sum(x)) / len(x) 
- 
+    assert len(x) > 0
+    return float(sum(x)) / len(x)
+
 def pearson_def(x, y):
     """Calculate pearson correlation between list x and y, lists need to have the same length"""
-    assert len(x) == len(y) 
-    n = len(x) 
-    assert n > 0 
-    avg_x = average(x) 
-    avg_y = average(y) 
-    diffprod = 0 
-    xdiff2 = 0 
-    ydiff2 = 0 
-    for idx in range(n): 
-        xdiff = x[idx] - avg_x 
-        ydiff = y[idx] - avg_y 
-        diffprod += xdiff * ydiff 
-        xdiff2 += xdiff * xdiff 
-        ydiff2 += ydiff * ydiff 
+    assert len(x) == len(y)
+    n = len(x)
+    assert n > 0
+    avg_x = average(x)
+    avg_y = average(y)
+    diffprod = 0
+    xdiff2 = 0
+    ydiff2 = 0
+    for idx in range(n):
+        xdiff = x[idx] - avg_x
+        ydiff = y[idx] - avg_y
+        diffprod += xdiff * ydiff
+        xdiff2 += xdiff * xdiff
+        ydiff2 += ydiff * ydiff
     if (xdiff2 * ydiff2) != 0:   # checks if one of the pixels is 0  intensity, avoids div0 error
         return round((diffprod / math.sqrt(xdiff2 * ydiff2) ),3)
     else:
         return "n/a" #returns "n/a" if one pixel value is 0
-        
 
-# function to get the pixel values in a ROI as a list 
-# gets the bounding box and the corresponding mask for polygon ROI, then retrieves the intensity values of all pixels within the ROI as a list 
-# Code adapted from Java implementation in Burger and Burge "Digital image processing" 
- 
-def pixel_values(roi): 
+
+# function to get the pixel values in a ROI as a list
+# gets the bounding box and the corresponding mask for polygon ROI, then retrieves the intensity values of all pixels within the ROI as a list
+# Code adapted from Java implementation in Burger and Burge "Digital image processing"
+
+def pixel_values(roi):
     """extract each pixel value from a polygon roi into a list
     does not work for square rois!"""
-    pixel = [] 
+    pixel = []
     mask =  roi.getMask()    # polygon rois are defined by a mask
-    box = roi.getBounds() 
-    boxLeft = box.x 
-    boxRight = boxLeft + box.width 
-    boxTop = box.y 
-    boxBottom = boxTop + box.height 
-    for v in range (boxTop, boxBottom): 
-        for u in range (boxLeft, boxRight):       
-            if mask.getPixel(u - boxLeft, v - boxTop) > 0: 
-                pixel.append(imp.getProcessor().getPixel(u,v)) 
-    return pixel 
- 
-def pixel_values_rect(roi): 
-    """extract each pixel value from a square roi into a list"""
-    pixel = [] 
-    mask =  roi.getMask() 
-    box = roi.getBounds() 
-    boxLeft = box.x 
-    boxRight = boxLeft + box.width 
-    boxTop = box.y 
-    boxBottom = boxTop + box.height 
-    for v in range (boxTop, boxBottom): 
+    box = roi.getBounds()
+    boxLeft = box.x
+    boxRight = boxLeft + box.width
+    boxTop = box.y
+    boxBottom = boxTop + box.height
+    for v in range (boxTop, boxBottom):
         for u in range (boxLeft, boxRight):
-            #if mask.getPixel(u - boxLeft, v - boxTop) > 0: 
-            pixel.append(imp.getProcessor().getPixel(u,v)) 
-    return pixel 
- 
+            if mask.getPixel(u - boxLeft, v - boxTop) > 0:
+                pixel.append(imp.getProcessor().getPixel(u,v))
+    return pixel
+
+def pixel_values_rect(roi):
+    """extract each pixel value from a square roi into a list"""
+    pixel = []
+    mask =  roi.getMask()
+    box = roi.getBounds()
+    boxLeft = box.x
+    boxRight = boxLeft + box.width
+    boxTop = box.y
+    boxBottom = boxTop + box.height
+    for v in range (boxTop, boxBottom):
+        for u in range (boxLeft, boxRight):
+            #if mask.getPixel(u - boxLeft, v - boxTop) > 0:
+            pixel.append(imp.getProcessor().getPixel(u,v))
+    return pixel
 
 
-def GenerateGallery(imp, CoordinateList):  
+
+def GenerateGallery(imp, CoordinateList):
     """ Generates a gallery from a list of coordinates:
     input values are:
     a coordinate list (x,y as list of tupels)
     an image from which the gallery is generated (imp),
     Image must (for now) be a 8 or 16 bit composite
     a ROI size for the gallery (roisize)"""
-    if CoordinateList != []:    
+    if CoordinateList != []:
         CellNumber = len(CoordinateList)
         channelnumber = imp.getNChannels()
         slicenumber = imp.getNSlices()
@@ -268,7 +268,7 @@ def GenerateGallery(imp, CoordinateList):
         if Label_Gallery:
             timer2 = 0
             for cells in CoordinateList:
-                
+
                 timer2 = timer2 + 1
                 imp2.setT(timer2)
                 imp2.setC(1)
@@ -279,7 +279,7 @@ def GenerateGallery(imp, CoordinateList):
                 ROINumber = str(cells[2])
                 ip.drawString(ROINumber[:4], 5, 14)
                 imp.updateAndDraw()
-            
+
         return imp2
 
 
@@ -291,7 +291,7 @@ def GenerateGallery(imp, CoordinateList):
 
 
 ################################################################
-###  Get original image, then either threshold it first using 
+###  Get original image, then either threshold it first using
 ###  MaxEntropy autothreshold or work directly on the original #
 ### All work is done none-destrcutively on a copy of the original
 
@@ -327,37 +327,37 @@ pixelWidth = imp.getCalibration().pixelWidth
 print pixelWidth
 
 
-coordinates = [] 
+coordinates = []
 
 ### setting up the results tables ####
 
-ort = ResultsTable() 
-ort.setPrecision(0) 
-#print ort.getCounter 
-ort.setHeading(0, "Cell") 
-ort.setHeading(1, "Point_C1") 
-ort.setHeading(2, "Point_C2") 
-ort.setHeading(3, "Distance in um") 
-ort.setHeading(4, "Distance in pixel") 
-ort.setHeading(5, "Area in um") 
-ort.setHeading(6, "Feret in um") 
+ort = ResultsTable()
+ort.setPrecision(0)
+#print ort.getCounter
+ort.setHeading(0, "Cell")
+ort.setHeading(1, "Point_C1")
+ort.setHeading(2, "Point_C2")
+ort.setHeading(3, "Distance in um")
+ort.setHeading(4, "Distance in pixel")
+ort.setHeading(5, "Area in um")
+ort.setHeading(6, "Feret in um")
 
-#pixelWidth = imp.getCalibration().pixelWidth 
+#pixelWidth = imp.getCalibration().pixelWidth
 
- 
-ort2 = ResultsTable() 
-ort2.setPrecision(3) 
-ort2.setHeading(0, "Cell") 
-ort2.setHeading(1, "Channel") 
-ort2.setHeading(2, "Point #") 
-ort2.setHeading(3, "Coordinates") 
-ort2.setHeading(4, "Distance from center in um") 
+
+ort2 = ResultsTable()
+ort2.setPrecision(3)
+ort2.setHeading(0, "Cell")
+ort2.setHeading(1, "Channel")
+ort2.setHeading(2, "Point #")
+ort2.setHeading(3, "Coordinates")
+ort2.setHeading(4, "Distance from center in um")
 if DoPearson_per_Spot:
-    ort2.setHeading(5, "Pearson of spot") 
+    ort2.setHeading(5, "Pearson of spot")
 
 threshold = ImageProcessor.NO_THRESHOLD
- 
-allPearson = [] 
+
+allPearson = []
 
 cell = start_number   # used as a counter for each measured cell
 
@@ -366,42 +366,42 @@ cell = start_number   # used as a counter for each measured cell
 ### Each ROI in the ROI manager is actiavted, measured and  maxima are identified. Diverse Measurements are made in addition
 
 
-for roi in RoiManager.getInstance().getRoisAsArray(): 
+for roi in RoiManager.getInstance().getRoisAsArray():
     HasFilteredSpots = False    # will become True in case some of the spots correspond the the filter criteria defined above
     roiname=RoiManager.getInstance().getName(cell)   # Find the name of the currently active ROI
-    item1counter = 0 
-    item2counter = 0 
-    pixelC1 = [] 
-    pixelC2 = [] 
-    cell = cell+1 
-    imp.setC(1)   
-    imp.setRoi(roi) 
+    item1counter = 0
+    item2counter = 0
+    pixelC1 = []
+    pixelC2 = []
+    cell = cell+1
+    imp.setC(1)
+    imp.setRoi(roi)
     if DoPearson_per_Cell:
-        pixelC1 = pixel_values(roi) 
+        pixelC1 = pixel_values(roi)
     stats = imp.getStatistics(Measurements.MEAN | Measurements.AREA | Measurements.FERET | Measurements.CENTROID | Measurements.ELLIPSE)    ## Measurements using the ImageJ Stats module
     IJ.run(imp, "Find Maxima...", noisec1_1)    # Finds the maxima in Channel 1, gets them as array of point ROIs
     points_C1 = []
-    proi =  IJ.getImage().getRoi() 
-    if proi.getClass() == PointRoi: 
+    proi =  IJ.getImage().getRoi()
+    if proi.getClass() == PointRoi:
         #### For each point ROI identified by FindMaxima, the coordinates are added to a list
-        px = proi.getXCoordinates() 
-        py = proi.getYCoordinates() 
-        bounds = proi.getBounds() 
-        #points_C1 = [] 
-        for i in range(proi.getNCoordinates()): 
-           points_C1.append((bounds.x + px[i], bounds.y + py[i])) 
-           #points.append((px[i], py[i])) 
-        #print points_C1 
+        px = proi.getXCoordinates()
+        py = proi.getYCoordinates()
+        bounds = proi.getBounds()
+        #points_C1 = []
+        for i in range(proi.getNCoordinates()):
+           points_C1.append((bounds.x + px[i], bounds.y + py[i]))
+           #points.append((px[i], py[i]))
+        #print points_C1
     ### reading out the measured statistics
-    means = stats.mean       
-    area = stats.area 
+    means = stats.mean
+    area = stats.area
     ellipse_length = stats.major
     ellipse_width = stats.minor
-    feret = roi.getFeretsDiameter() 
-    boundingbox = roi.getBounds() 
-    centerx = round(stats.xCentroid/pixelWidth , 3)  
-    centery = round(stats.yCentroid/pixelWidth , 3)    
-    center = (centerx,centery)  
+    feret = roi.getFeretsDiameter()
+    boundingbox = roi.getBounds()
+    centerx = round(stats.xCentroid/pixelWidth , 3)
+    centery = round(stats.yCentroid/pixelWidth , 3)
+    center = (centerx,centery)
     center_ROInumber = (centerx,centery,roiname)
     print cell, center
     print cell, center_ROInumber
@@ -413,7 +413,7 @@ for roi in RoiManager.getInstance().getRoisAsArray():
     if DoPearson_per_Cell:
         pixelC2 = pixel_values(roi)
         pearson = (pearson_def(pixelC1, pixelC2)) # calculate pearson of the cell ROI in channel 1 and 2
-        allPearson.append(pearson) 
+        allPearson.append(pearson)
     IJ.run(imp, "Find Maxima...", noisec2_1)
     proi2 =  IJ.getImage().getRoi()
     points_C2 = []
@@ -439,7 +439,7 @@ for roi in RoiManager.getInstance().getRoisAsArray():
         ort.addValue("Area in um", area)
         ort.addValue("Feret in um", feret)
         ort.addValue("Fittet Elipse - Length", str(round(ellipse_length, 3)))
-        ort.addValue("Fittet Elipse - Width", str(round(ellipse_width, 3)))        
+        ort.addValue("Fittet Elipse - Width", str(round(ellipse_width, 3)))
         ort.addValue("Center", str(center))
         ort.addValue("Center - Point_C1 in um", 'Invalid')
         ort.addValue("Center - Point_C2 in um", 'Invalid')
@@ -449,10 +449,10 @@ for roi in RoiManager.getInstance().getRoisAsArray():
             ort.addValue("Pearson per cell", str(pearson))
         if DoPearson_per_Spot:
             ort.addValue("Pearson_Spot_C1", 'Invalid')
-            ort.addValue("Pearson_Spot_C2", 'Invalid') 
-        ort.addValue("Point_C2", 'Invalid')  
+            ort.addValue("Pearson_Spot_C2", 'Invalid')
+        ort.addValue("Point_C2", 'Invalid')
         ort.addValue("Point_C1", 'Invalid')
-    
+
 
 ## point-based measurements and results tables
 
@@ -473,7 +473,7 @@ for roi in RoiManager.getInstance().getRoisAsArray():
                 pearsons_spot1 = (pearson_def(pixels_Spots1_C1, pixels_Spots1_C2))
             #Distance from center
             distance_center_spot1 = round(dist(item1, center),3)
-            
+
             if Nearest_Neighbour_Only:
             #Create new list with distances to points in C2 and find index to shortest one
                 f = lambda pC2: dist(item1, pC2)
@@ -505,7 +505,7 @@ for roi in RoiManager.getInstance().getRoisAsArray():
                 ort.addValue("Area in um", area)
                 ort.addValue("Feret in um", feret)
                 ort.addValue("Fittet Elipse - Length", str(round(ellipse_length, 3)))
-                ort.addValue("Fittet Elipse - Width", str(round(ellipse_width, 3)))                       
+                ort.addValue("Fittet Elipse - Width", str(round(ellipse_width, 3)))
                 ort.addValue("Center", str(center))
                 ort.addValue("Center - Point_C1 in um", str(round((distance_center_spot1*pixelWidth),3)))
                 ort.addValue("Center - Point_C2 in um", str(round((distance_center_spot2*pixelWidth),3)))
@@ -515,13 +515,13 @@ for roi in RoiManager.getInstance().getRoisAsArray():
                     ort.addValue("Pearson per cell", str(pearson))
                 if DoPearson_per_Spot:
                     ort.addValue("Pearson_Spot_C1", str(pearsons_spot1))
-                    ort.addValue("Pearson_Spot_C2", str(pearsons_spot2))      
+                    ort.addValue("Pearson_Spot_C2", str(pearsons_spot2))
                 if (distance_in_um > Filter_Distance_Min) and (distance_in_um < Filter_Distance_Max):
                          HasFilteredSpots = True
-                
-                
-            else:    
-    
+
+
+            else:
+
                 for item2 in points_C2:
                     pixels_Spots2_C1 = []
                     pixels_Spots2_C2 = []
@@ -547,7 +547,7 @@ for roi in RoiManager.getInstance().getRoisAsArray():
                     ort.addValue("Area in um", area)
                     ort.addValue("Feret in um", feret)
                     ort.addValue("Fittet Elipse - Length", str(round(ellipse_length, 3)))
-                    ort.addValue("Fittet Elipse - Width", str(round(ellipse_width, 3)))       
+                    ort.addValue("Fittet Elipse - Width", str(round(ellipse_width, 3)))
                     ort.addValue("Center", str(center))
                     ort.addValue("Center - Point_C1 in um", str(round((distance_center_spot1*pixelWidth),3)))
                     ort.addValue("Center - Point_C2 in um", str(round((distance_center_spot2*pixelWidth),3)))
@@ -557,11 +557,11 @@ for roi in RoiManager.getInstance().getRoisAsArray():
                         ort.addValue("Pearson per cell", str(pearson))
                     if DoPearson_per_Spot:
                         ort.addValue("Pearson_Spot_C1", str(pearsons_spot1))
-                        ort.addValue("Pearson_Spot_C2", str(pearsons_spot2))      
+                        ort.addValue("Pearson_Spot_C2", str(pearsons_spot2))
                     if (distance_in_um > Filter_Distance_Min) and (distance_in_um < Filter_Distance_Max):
                          HasFilteredSpots = True
-                
-                
+
+
     if points_C1 != []:
         for item1 in points_C1:
             item1counter = item1counter + 1
@@ -582,7 +582,7 @@ for roi in RoiManager.getInstance().getRoisAsArray():
                 imp.setRoi(Intensity_ROI)
                 stats = imp.getStatistics(Measurements.MEAN | Measurements.AREA | Measurements.FERET | Measurements.CENTROID)
                 spot_mean1 =stats.mean
-            
+
             #Distance from center
             distance_center_spot1 = round(dist(item1, center),3)
             ort2.incrementCounter()
@@ -610,7 +610,7 @@ for roi in RoiManager.getInstance().getRoisAsArray():
             ort2.addValue("Mean Intensity of spot", '')
 
 
-    if points_C2 != []:        
+    if points_C2 != []:
         for item2 in points_C2:
             item2counter = item2counter + 1
             pixels_Spots2_C1 = []
@@ -631,7 +631,7 @@ for roi in RoiManager.getInstance().getRoisAsArray():
                 imp.setRoi(Intensity_ROI)
                 stats = imp.getStatistics(Measurements.MEAN | Measurements.AREA | Measurements.FERET | Measurements.CENTROID)
                 spot_mean2 =stats.mean
-            
+
             distance_center_spot2 = round(dist(item2, center),3)
             ort2.incrementCounter()
             ort2.addValue("Cell", cell)
@@ -665,41 +665,41 @@ for roi in RoiManager.getInstance().getRoisAsArray():
         IJ.run("Draw")
 
 
-     
+
     if OutlineMaxima:
-        if points_C1 != []:        
+        if points_C1 != []:
             for item1 in points_C1:
                 roi_outline_C1 = Roi(item1[0]-2, item1[1]-2,5,5)
                 imageproc = imp.getProcessor()
                 imageproc.setRoi(roi_outline_C1)
                 imageproc.setValue(65535)
                 imageproc.draw(roi_outline_C1)
-        if points_C2 != []:        
+        if points_C2 != []:
             for item2 in points_C2:
                 roi_outline_C2 = Roi(item2[0]-2, item2[1]-2,5,5)
                 imp.setC(2)
                 imageproc = imp.getProcessor()
                 imageproc.setRoi(roi_outline_C2)
                 imageproc.setValue(65535)
-                imageproc.draw(roi_outline_C2)                
-   
-    
+                imageproc.draw(roi_outline_C2)
+
+
     if (area > Filter_Area_Min) and (area < Filter_Area_Max):
         Filtered_Cells_Area.append(center_ROInumber)
-        
+
     if (area > Filter_Length_Min) and (area < Filter_Length_Max):
         Filtered_Cells_Length.append(center_ROInumber)
-     
+
     if (len(points_C1) > C1_Filter_Spots_Min) and (len(points_C1)< C1_Filter_Spots_Max):
         C1_Filtered_Cells_Spots.append(center_ROInumber)
     if (len(points_C2) > C2_Filter_Spots_Min) and (len(points_C2)< C2_Filter_Spots_Max):
         C2_Filtered_Cells_Spots.append(center_ROInumber)
-        
+
     if HasFilteredSpots:
         Filtered_Cells_SpotDistance.append(center_ROInumber)
-        
 
- 
+
+
 
 ## Generates a gallery for cells filtered by area
 if Generate_Gallery_Area:
@@ -710,14 +710,14 @@ if Generate_Gallery_Area:
 
 if Generate_Gallery_Length:
     imp3 = GenerateGallery(imp, Filtered_Cells_Length)
-    if imp3 != None:    
+    if imp3 != None:
         imp3.setTitle("Cells filtered by cell length")
 
 if Generate_Gallery_SpotDistance:
     imp4 = GenerateGallery(imp,Filtered_Cells_SpotDistance)
     if imp4 != None:
         imp4.setTitle("Cells filtered by Spot Distance")
-    
+
 if Generate_Gallery_Spotnumber_C1:
     imp5 = GenerateGallery(imp,C1_Filtered_Cells_Spots)
     if imp5 != None:
@@ -769,7 +769,3 @@ if automatic_save_results:
 
 IJ.run(imp, "Select None", "");
 imp.changes = False
-
-
-    
-
