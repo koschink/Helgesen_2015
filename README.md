@@ -1,4 +1,5 @@
-# Helgesen_2015
+# Spot Colocalizer
+
 A script to measure distances of replication foci in E.coli using ImageJ and Python. 
 For a more complete description, see our publication:
 Dynamic Escherichia coli SeqA complexes organize the newly replicated DNA at a considerable distance from the replisome
