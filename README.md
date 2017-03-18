@@ -2,7 +2,7 @@
 
 A script to measure distances of replication foci in E.coli using ImageJ and Python. 
 For a more complete description, see our publication:
-Dynamic Escherichia coli SeqA complexes organize the newly replicated DNA at a considerable distance from the replisome
+"Dynamic Escherichia coli SeqA complexes organize the newly replicated DNA at a considerable distance from the replisome" 
 Helgesen et al, 2015 
 (https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4357733/)
 
